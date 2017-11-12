@@ -8,7 +8,7 @@ public class TimerController : NetworkBehaviour {
 	public Button button;
 
 	int readyPlayers;
-	private List<CarController> players = new List<CarController> ();
+	private PlayersHub hub;
 	private float time;
 	private bool countdownOn = false;
 	private bool timerOn = false;
@@ -20,12 +20,12 @@ public class TimerController : NetworkBehaviour {
 		return GameObject.Find ("Timer").GetComponent<TimerController> ();
 	}
 
-	public void OnStartLocal () {
-		button.onClick.AddListener (OnReady);
+	public override void OnStartServer () {
+		hub = PlayersHub.GetInstance ();
 	}
 
-	public void AddPlayer (CarController player) {
-		players.Add (player);
+	public void OnStartLocal () {
+		button.onClick.AddListener (OnReady);
 	}
 
 	void OnReady () {
@@ -34,7 +34,7 @@ public class TimerController : NetworkBehaviour {
 
 	[Command]
 	void CmdOnPlayerReady () {
-		if (++readyPlayers == players.Count) {
+		if (++readyPlayers == hub.Count) {
 			time = 3f;
 			countdownText = "3";
 			countdownOn = true;
@@ -42,8 +42,7 @@ public class TimerController : NetworkBehaviour {
 	}
 
 	void UpdateCountdownText (string newCountdownText) {
-		Text text = GameObject.Find ("WinText").GetComponent<Text>();
-		text.text = newCountdownText;
+		UIController.SetWinText (newCountdownText);
 	}
 
 	void Update () {
@@ -51,9 +50,7 @@ public class TimerController : NetworkBehaviour {
 			time -= Time.deltaTime;
 			if (time <= 0 && time >= -1) {
 				countdownText = "Start!";
-				foreach (CarController player in players) {
-					player.raceActive = true;
-				}
+				hub.SetRaceActivity (true);
 			}
 
 			if (time < -1) {
@@ -71,9 +68,7 @@ public class TimerController : NetworkBehaviour {
 		if (timerOn) {
 			time += Time.deltaTime;
 
-			foreach (CarController player in players) {
-				player.RpcUpdateTimeText (time);
-			}
+			hub.UpdateTimeText (time);
 		}
 	}
 }
