@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class PlayersHub : NetworkBehaviour {
+public class PlayersHub : MonoBehaviour {
 	private List<CarController> players = new List<CarController> ();
 	private int count = 0;
 
@@ -43,7 +43,7 @@ public class PlayersHub : NetworkBehaviour {
 	}
 
 	private CarController GetPlayerById (NetworkInstanceId id) {
-		return NetworkServer.FindLocalObject (netId).GetComponent<CarController> ();
+		return NetworkServer.FindLocalObject (id).GetComponent<CarController> ();
 	}
 
 	private void AddPlayerToInstance (CarController player) {

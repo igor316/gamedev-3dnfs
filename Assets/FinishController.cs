@@ -14,7 +14,6 @@ public class FinishController : NetworkBehaviour {
 
 	void OnTriggerEnter (Collider other)
 	{
-		Debug.Log (other.GetComponentInParent<NetworkIdentity> ().netId);
 		CmdRegisterFinisher(other.GetComponentInParent<NetworkIdentity> ().netId);
 	}
 
