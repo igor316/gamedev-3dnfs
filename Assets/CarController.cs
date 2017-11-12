@@ -15,14 +15,12 @@ public class CarController : NetworkBehaviour {
 
 	public override void OnStartServer () {
 		raceActive = false;
-		TimerController.GetInstance ().AddPlayer (this);
+		PlayersHub.AddPlayer (this);
 	}
 
 	public override void OnStartLocalPlayer ()
 	{
-		GameObject camera = GameObject.Find ("Main Camera");
-		CameraController cc = camera.GetComponent<CameraController> ();
-		cc.SetPlayer (gameObject);
+		CameraController.SetPlayer (gameObject);
 		TimerController.GetInstance ().OnStartLocal ();
 	}
 
@@ -72,8 +70,7 @@ public class CarController : NetworkBehaviour {
 		if (!isLocalPlayer) {
 			return;
 		}
-		Text text = GameObject.Find ("WinText").GetComponent<Text>();
-		text.text = "You are the " + count + GetCountSuffix (count);
+		UIController.SetWinText ("You are the " + count + GetCountSuffix (count));
 	}
 
 	[ClientRpc]
@@ -81,8 +78,7 @@ public class CarController : NetworkBehaviour {
 		if (!isLocalPlayer || !raceActive) {
 			return;
 		}
-		Text text = GameObject.Find ("TimeText").GetComponent<Text>();
-		text.text = "Time: " + time + "s";
+		UIController.SetTimeText ("Time: " + time + "s");
 	}
 
 	string GetCountSuffix (int num) {

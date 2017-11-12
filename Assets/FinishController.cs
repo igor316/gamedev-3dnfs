@@ -5,9 +5,11 @@ using UnityEngine.Networking;
 
 public class FinishController : NetworkBehaviour {
 	private int winnersCount;
+	private PlayersHub hub;
 
 	public override void OnStartServer () {
 		winnersCount = 0;
+		hub = PlayersHub.GetInstance ();
 	}
 
 	void OnTriggerEnter (Collider other)
@@ -18,9 +20,8 @@ public class FinishController : NetworkBehaviour {
 	[Command]
 	void CmdRegisterFinisher (NetworkInstanceId netId) {
 		lock (this) {
-			CarController player = NetworkServer.FindLocalObject (netId).GetComponent<CarController> ();
-			player.RpcSetFinishText (++winnersCount);
-			player.raceActive = false;
+			hub.SetRaceActivityById (netId, false);
+			hub.UpdateFinishTextById (netId, ++winnersCount);
 		}
 	}
 }

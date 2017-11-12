@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour {
-	public GameObject player;
+	private GameObject player;
 	private Vector3 offset;
 
-	public void SetPlayer (GameObject p) {
-		player = p;
-		offset = new Vector3 (0, 10, -15);
+	static CameraController GetInstance () {
+		return GameObject.Find ("Main Camera").GetComponent<CameraController> ();
+	}
+
+	public static void SetPlayer (GameObject player) {
+		CameraController self = GetInstance ();
+		self.player = player;
+		self.offset = new Vector3 (0, 10, -15);
 	}
 
 	void LateUpdate () {
