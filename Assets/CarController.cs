@@ -3,17 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class CarController : NetworkBehaviour {
 	public List<AxleInfo> axleInfos;
 	public float maxMotorTorque;
 	public float maxSteeringAngle;
 
+	[SyncVar]
+	public bool raceActive;
+
+	public override void OnStartServer () {
+		raceActive = false;
+		TimerController.GetInstance ().AddPlayer (this);
+	}
+
 	public override void OnStartLocalPlayer ()
 	{
 		GameObject camera = GameObject.Find ("Main Camera");
 		CameraController cc = camera.GetComponent<CameraController> ();
 		cc.SetPlayer (gameObject);
+		TimerController.GetInstance ().OnStartLocal ();
 	}
 
 	public void ApplyLocalPositionToVisuals(WheelCollider wheelCollider) {
@@ -32,6 +42,9 @@ public class CarController : NetworkBehaviour {
 
 	public void FixedUpdate()
 	{
+		if (!isLocalPlayer || !raceActive) {
+			return;
+		}
 		float motor = maxMotorTorque * Input.GetAxis("Vertical");
 		float steering = maxSteeringAngle * Input.GetAxis("Horizontal");
 
@@ -52,6 +65,38 @@ public class CarController : NetworkBehaviour {
 			ApplyLocalPositionToVisuals (axleInfo.leftWheel);
 			ApplyLocalPositionToVisuals (axleInfo.rightWheel);
 		}
+	}
+
+	[ClientRpc]
+	public void RpcSetFinishText (int count) {
+		if (!isLocalPlayer) {
+			return;
+		}
+		Text text = GameObject.Find ("WinText").GetComponent<Text>();
+		text.text = "You are the " + count + GetCountSuffix (count);
+	}
+
+	[ClientRpc]
+	public void RpcUpdateTimeText (float time) {
+		if (!isLocalPlayer || !raceActive) {
+			return;
+		}
+		Text text = GameObject.Find ("TimeText").GetComponent<Text>();
+		text.text = "Time: " + time + "s";
+	}
+
+	string GetCountSuffix (int num) {
+		if (num == 1) {
+			return "-st";
+		}
+		if (num == 2) {
+			return "-nd";
+		}
+		if (num == 1) {
+			return "-rd";
+		}
+
+		return "-th";
 	}
 }
 

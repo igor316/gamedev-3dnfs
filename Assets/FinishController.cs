@@ -1,12 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Networking;
 
-public class FinishController : MonoBehaviour {
-	void OnTriggerEnter(Collider other)
+public class FinishController : NetworkBehaviour {
+	private int winnersCount;
+
+	public override void OnStartServer () {
+		winnersCount = 0;
+	}
+
+	void OnTriggerEnter (Collider other)
 	{
-		Text text = GameObject.Find ("WinText").GetComponent<Text>();
-		text.text = "You Win!";
+		CmdRegisterFinisher(other.GetComponentInParent<NetworkIdentity> ().netId);
+	}
+
+	[Command]
+	void CmdRegisterFinisher (NetworkInstanceId netId) {
+		lock (this) {
+			CarController player = NetworkServer.FindLocalObject (netId).GetComponent<CarController> ();
+			player.RpcSetFinishText (++winnersCount);
+			player.raceActive = false;
+		}
 	}
 }

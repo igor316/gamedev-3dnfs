@@ -8,7 +8,7 @@ public class CameraController : MonoBehaviour {
 
 	public void SetPlayer (GameObject p) {
 		player = p;
-		offset = transform.position - player.transform.position;
+		offset = new Vector3 (0, 10, -15);
 	}
 
 	void LateUpdate () {
