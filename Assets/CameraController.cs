@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour {
 	private GameObject player;
-	private Vector3 offset;
 
 	static CameraController GetInstance () {
 		return GameObject.Find ("Main Camera").GetComponent<CameraController> ();
@@ -13,12 +12,21 @@ public class CameraController : MonoBehaviour {
 	public static void SetPlayer (GameObject player) {
 		CameraController self = GetInstance ();
 		self.player = player;
-		self.offset = new Vector3 (0, 10, -15);
 	}
 
 	void LateUpdate () {
 		if (player != null) {
-			transform.position = player.transform.position + offset;
+			Vector3 currWithVelocityPosition =
+				transform.position + player.GetComponent<Rigidbody>().velocity * Time.deltaTime;
+			Vector3 offset =  -15 * player.transform.forward;
+			offset.y = 10;
+
+			Vector3 origin = player.transform.position + offset;
+			Vector3 delta = (origin - currWithVelocityPosition) / 30;
+			Vector3 newPosition = currWithVelocityPosition + delta;
+
+			transform.position = newPosition;
+			transform.rotation = Quaternion.LookRotation(player.transform.position - newPosition);
 		}
 	}
 }

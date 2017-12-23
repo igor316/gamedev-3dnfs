@@ -474,8 +474,9 @@ MonoBehaviour:
     rightWheel: {fileID: 146194342638049182}
     motor: 0
     steering: 0
-  maxMotorTorque: 1500
+  maxMotorTorque: 250
   maxSteeringAngle: 45
+  raceActive: 0
 --- !u!114 &114858771512620906
 MonoBehaviour:
   m_ObjectHideFlags: 1

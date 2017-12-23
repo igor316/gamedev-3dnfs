@@ -56,7 +56,7 @@ public class CarController : NetworkBehaviour {
 				if (axleInfo.leftWheel.rpm * motor < 0) {
 					rate *= 100;
 				}
-				Console.WriteLine (rate);
+
 				axleInfo.leftWheel.motorTorque = rate * motor;
 				axleInfo.rightWheel.motorTorque = rate * motor;
 			}

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class PlayersHub : MonoBehaviour {
+public class PlayersHub : NetworkBehaviour {
 	private List<CarController> players = new List<CarController> ();
 	private int count = 0;
 
@@ -50,4 +50,10 @@ public class PlayersHub : MonoBehaviour {
 		players.Add (player);
 		count++;
 	}
+
+	void OnPlayerDisconnected(NetworkPlayer player) {
+		Debug.Log("Clean up after player " + player);
+		Network.RemoveRPCs(player);
+		Network.DestroyPlayerObjects(player);
+  }
 }
