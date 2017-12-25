@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UserStatsService;
 
 public class UIController : MonoBehaviour {
 	Text winText;
@@ -22,5 +23,13 @@ public class UIController : MonoBehaviour {
 
 	public static void SetTimeText (string text) {
 		GetInstance ().timeText.text = text;
+	}
+
+	public void UpdateTable (LoginResultModel model) {
+		RaceResultModel[] results = model.results;
+
+		foreach () {
+			
+		}
 	}
 }
