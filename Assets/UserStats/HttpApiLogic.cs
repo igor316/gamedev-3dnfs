@@ -3,10 +3,10 @@ using UnityEngine.Networking;
 using System;
 
 namespace UserStatsService {
-  public class HttpApiLogin : IApiInterface {
+  public class HttpApiLogic : IApiInterface {
     private IRequestSender requestSender;
 
-    public HttpApiLogin (IRequestSender requestSender) {
+    public HttpApiLogic (IRequestSender requestSender) {
       this.requestSender = requestSender;
     }
 

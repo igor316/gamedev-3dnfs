@@ -11,6 +11,7 @@ namespace UserStatsService {
   public class UserCredentialsModel {
     public string login;
     public string password;
+    public bool isNewPlayer;
   }
 
   [Serializable]
@@ -24,7 +25,7 @@ namespace UserStatsService {
   [Serializable]
   public class LoginResultModel {
     public string token;
-    RaceResultModel[] results;
+    public RaceResultModel[] results;
   }
 
   [Serializable]

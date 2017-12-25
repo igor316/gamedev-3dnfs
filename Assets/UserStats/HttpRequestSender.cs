@@ -7,6 +7,10 @@ namespace UserStatsService {
   public class HttpRequestSender : MonoBehaviour, IRequestSender {
     private static string BASE_URL = "http://localhost:3000";
 
+    public static HttpRequestSender GetInstance () {
+      return GameObject.Find ("NetworkManager").GetComponent<HttpRequestSender> ();
+    }
+
     public void Send (string uri, object model, Action<string> cb) {
       StartCoroutine (SendHttpRequest(uri, model, cb));
     }

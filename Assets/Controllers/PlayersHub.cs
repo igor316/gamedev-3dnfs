@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UserStatsService;
 
 public class PlayersHub : NetworkBehaviour {
 	private List<CarController> players = new List<CarController> ();
@@ -9,9 +10,12 @@ public class PlayersHub : NetworkBehaviour {
 	private static int COINS_COUNT = 10;
 	private static int MOTOR_TORQUE_INCREMENT = 100;
 	private static int SUPER_MOTOR_TORQUE_INCREMENT = 1000;
+	private float time;
 
 	public GameObject achievementPrefab;
 	public GameObject superAchievementPrefab;
+
+	IApiInterface api;
 
 	public int Count {
 		get {
@@ -40,6 +44,8 @@ public class PlayersHub : NetworkBehaviour {
 				Quaternion.AngleAxis(45, Vector3.up) * Quaternion.AngleAxis(90, Vector3.forward)
 			)
 		);
+
+		api = new HttpApiLogic (HttpRequestSender.GetInstance ());
 	}
 
 	public static PlayersHub GetInstance () {
@@ -48,6 +54,38 @@ public class PlayersHub : NetworkBehaviour {
 
 	public static void AddPlayer (CarController player) {
 		GetInstance ().AddPlayerToInstance (player);
+	}
+
+	public void DoLogin (UserCredentialsModel model, NetworkInstanceId netId) {
+		if (model.isNewPlayer) {
+			api.DoLogin (model, (LoginResultModel response) => {
+				var player = GetPlayerById (netId);
+
+				player.RpcUpdateStatsTable (response);
+				player.login = model.login;
+				player.token = response.token;
+			});
+		} else {
+			api.DoSignIn (model, (SignInResultModel response) => {
+				var player = GetPlayerById (netId);
+
+				player.login = model.login;
+				player.token = response.token;
+			});
+		}
+	}
+
+	public void PostResult (NetworkInstanceId netId, int place) {
+		var player = GetPlayerById (netId);
+
+		api.DoPostRaceResult (new RaceResultModel {
+			login = player.login,
+			token = player.token,
+			place = place,
+			time = time
+		}, (LoginResultModel model) => {
+			player.RpcUpdateStatsTable (model);
+		});
 	}
 
 	public void SetRaceActivity (bool isActive) {
@@ -62,6 +100,7 @@ public class PlayersHub : NetworkBehaviour {
 	}
 
 	public void UpdateTimeText (float time) {
+		this.time = time;
 		foreach (CarController player in players) {
 			player.RpcUpdateTimeText (time);
 		}
@@ -84,10 +123,4 @@ public class PlayersHub : NetworkBehaviour {
 		players.Add (player);
 		count++;
 	}
-
-	void OnPlayerDisconnected(NetworkPlayer player) {
-		Debug.Log("Clean up after player " + player);
-		Network.RemoveRPCs(player);
-		Network.DestroyPlayerObjects(player);
-  }
 }

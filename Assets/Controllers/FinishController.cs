@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UserStatsService;
 
 public class FinishController : NetworkBehaviour {
 	private int winnersCount;
@@ -22,6 +23,7 @@ public class FinishController : NetworkBehaviour {
 		lock (this) {
 			hub.SetRaceActivityById (netId, false);
 			hub.UpdateFinishTextById (netId, ++winnersCount);
+			hub.PostResult (netId, winnersCount);
 		}
 	}
 }

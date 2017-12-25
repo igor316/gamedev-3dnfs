@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using UserStatsService;
 
 public class TimerController : NetworkBehaviour {
 	public Button button;
+	public GameObject player;
 
-	int readyPlayers;
+	private int readyPlayers;
 	private PlayersHub hub;
 	private float time;
 	private bool countdownOn = false;
@@ -20,6 +22,11 @@ public class TimerController : NetworkBehaviour {
 		return GameObject.Find ("Timer").GetComponent<TimerController> ();
 	}
 
+	public static void SetPlayer (GameObject player) {
+		TimerController self = GetInstance ();
+		self.player = player;
+	}
+
 	public override void OnStartServer () {
 		hub = PlayersHub.GetInstance ();
 	}
@@ -29,11 +36,18 @@ public class TimerController : NetworkBehaviour {
 	}
 
 	void OnReady () {
-		CmdOnPlayerReady ();
+		var model = UIController.GetUserCredentialsModel ();
+
+		if (model.login.Length > 2 && model.password.Length > 4) {
+			CmdOnPlayerReady (model, player.GetComponent<NetworkIdentity> ().netId);
+			UIController.ToggleCredentialsActive ();
+		}
 	}
 
 	[Command]
-	void CmdOnPlayerReady () {
+	void CmdOnPlayerReady (UserCredentialsModel model, NetworkInstanceId netId) {
+		hub.DoLogin (model, netId);
+
 		if (++readyPlayers == hub.Count) {
 			time = 3f;
 			countdownText = "3";

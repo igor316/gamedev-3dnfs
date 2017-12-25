@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using UserStatsService;
 
 public class CarController : NetworkBehaviour {
 	public List<AxleInfo> axleInfos;
@@ -13,6 +14,9 @@ public class CarController : NetworkBehaviour {
 	[SyncVar]
 	public bool raceActive;
 
+	public string login { get; set; }
+	public string token { get; set; }
+
 	public override void OnStartServer () {
 		raceActive = false;
 		PlayersHub.AddPlayer (this);
@@ -21,6 +25,7 @@ public class CarController : NetworkBehaviour {
 	public override void OnStartLocalPlayer ()
 	{
 		CameraController.SetPlayer (gameObject);
+		TimerController.SetPlayer (gameObject);
 		TimerController.GetInstance ().OnStartLocal ();
 	}
 
@@ -88,6 +93,15 @@ public class CarController : NetworkBehaviour {
 		}
 
 		maxMotorTorque += increment;
+	}
+
+	[ClientRpc]
+	public void RpcUpdateStatsTable (LoginResultModel model) {
+		if (!isLocalPlayer) {
+			return;
+		}
+
+		UIController.UpdateStatsTable (model);
 	}
 
 	string GetCountSuffix (int num) {
