@@ -7,6 +7,8 @@ public class PlayersHub : NetworkBehaviour {
 	private List<CarController> players = new List<CarController> ();
 	private int count = 0;
 	private static int COINS_COUNT = 10;
+	private static int MOTOR_TORQUE_INCREMENT = 100;
+	private static int SUPER_MOTOR_TORQUE_INCREMENT = 1000;
 
 	public GameObject achievementPrefab;
 	public GameObject superAchievementPrefab;
@@ -67,6 +69,11 @@ public class PlayersHub : NetworkBehaviour {
 
 	public void UpdateFinishTextById (NetworkInstanceId id, int position) {
 		GetPlayerById (id).RpcSetFinishText (position);
+	}
+
+	public void ApplyAchievement (NetworkInstanceId id, bool isSuper) {
+		var increment = isSuper ? SUPER_MOTOR_TORQUE_INCREMENT : MOTOR_TORQUE_INCREMENT;
+		GetPlayerById (id).RpcIncreaseMotorTorque (increment);
 	}
 
 	private CarController GetPlayerById (NetworkInstanceId id) {

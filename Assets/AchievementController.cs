@@ -5,8 +5,38 @@ using UnityEngine.Networking;
 using System.Linq;
 
 public class AchievementController : NetworkBehaviour {
+  private PlayersHub hub;
+  public bool isSuper;
+
+  public override void OnStartServer () {
+    if (isServer) {
+      hub = PlayersHub.GetInstance ();
+    }
+  }
+
   void Update () {
     transform.Rotate (Vector3.up * Time.deltaTime * 100, Space.World);
+  }
+
+	void OnTriggerEnter (Collider other)
+	{
+		CmdApplyAchievement(other.GetComponentInParent<NetworkIdentity> ().netId);
+	}
+
+	[Command]
+	void CmdApplyAchievement (NetworkInstanceId netId) {
+		lock (this) {
+      if (gameObject.activeSelf) {
+        gameObject.SetActive (false);
+        RpcSetInactive ();
+  			hub.ApplyAchievement (netId, isSuper);
+      }
+		}
+	}
+
+  [ClientRpc]
+  void RpcSetInactive () {
+    gameObject.SetActive (false);
   }
 
   public static List<Vector2> GetRandomPositions (int count) {
@@ -30,7 +60,7 @@ public class AchievementController : NetworkBehaviour {
   }
 
   private static float GetX () {
-    return Random.value;
+    return Random.Range (0f, 1f);
   }
 
   private static float GetY (Range yRange) {
@@ -39,14 +69,14 @@ public class AchievementController : NetworkBehaviour {
 
   private static float InterpolateX (float oldX) {
     if (oldX <= 0.35) {
-      return oldX * 19f - 9.5f;
+      return oldX * 18f - 9f;
     }
 
     if (oldX <= 0.65) {
       return oldX * 80 + 10;
     }
 
-    return oldX * 19f + 90.5f;
+    return oldX * 18f + 91f;
   }
 
   private static Range GetYRange (float x) {

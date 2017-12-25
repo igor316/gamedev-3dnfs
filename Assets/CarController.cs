@@ -81,6 +81,15 @@ public class CarController : NetworkBehaviour {
 		UIController.SetTimeText ("Time: " + time + "s");
 	}
 
+	[ClientRpc]
+	public void RpcIncreaseMotorTorque (int increment) {
+		if (!isLocalPlayer || !raceActive) {
+			return;
+		}
+
+		maxMotorTorque += increment;
+	}
+
 	string GetCountSuffix (int num) {
 		if (num == 1) {
 			return "-st";
