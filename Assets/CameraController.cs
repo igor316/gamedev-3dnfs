@@ -16,14 +16,14 @@ public class CameraController : MonoBehaviour {
 
 	void LateUpdate () {
 		if (player != null) {
-			Vector3 currWithVelocityPosition =
+			Vector3 currWithTranslationalOffset =
 				transform.position + player.GetComponent<Rigidbody>().velocity * Time.deltaTime;
 			Vector3 offset =  -15 * player.transform.forward;
-			offset.y = 10;
 
 			Vector3 origin = player.transform.position + offset;
-			Vector3 delta = (origin - currWithVelocityPosition) / 30;
-			Vector3 newPosition = currWithVelocityPosition + delta;
+			Vector3 delta = (origin - currWithTranslationalOffset) / 30;
+			Vector3 newPosition = currWithTranslationalOffset + delta;
+			newPosition.y = 10;
 
 			transform.position = newPosition;
 			transform.rotation = Quaternion.LookRotation(player.transform.position - newPosition);

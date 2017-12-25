@@ -990,6 +990,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7272fed7843fe4d17be3eebb01809d55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  achievementPrefab: {fileID: 1350214160184160, guid: 295ad3d63ef3b478a8eb6c85547616bf,
+    type: 2}
+  superAchievementPrefab: {fileID: 1907303032707574, guid: 7a869250ce6334b27ad87fbc40c47e47,
+    type: 2}
 --- !u!4 &777475254
 Transform:
   m_ObjectHideFlags: 0
@@ -997,7 +1001,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 777475251}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.12456441, y: 1.7158931, z: 100.17614}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1795,7 +1799,9 @@ MonoBehaviour:
   m_PlayerSpawnMethod: 1
   m_OfflineScene: 
   m_OnlineScene: 
-  m_SpawnPrefabs: []
+  m_SpawnPrefabs:
+  - {fileID: 1350214160184160, guid: 295ad3d63ef3b478a8eb6c85547616bf, type: 2}
+  - {fileID: 1907303032707574, guid: 7a869250ce6334b27ad87fbc40c47e47, type: 2}
   m_CustomConfig: 0
   m_MaxConnections: 4
   m_ConnectionConfig:
