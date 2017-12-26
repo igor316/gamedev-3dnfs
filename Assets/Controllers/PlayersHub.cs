@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UserStatsService;
+using RoadsService;
 
 public class PlayersHub : NetworkBehaviour {
 	private List<CarController> players = new List<CarController> ();
@@ -16,6 +17,7 @@ public class PlayersHub : NetworkBehaviour {
 	public GameObject superAchievementPrefab;
 
 	IApiInterface api;
+	RoadController roads;
 
 	public int Count {
 		get {
@@ -24,7 +26,11 @@ public class PlayersHub : NetworkBehaviour {
 	}
 
 	public override void OnStartServer () {
-		var randomPositions = AchievementController.GetRandomPositions (COINS_COUNT);
+		api = new HttpApiLogic (HttpRequestSender.GetInstance ());
+		roads = RoadController.GetInstance ();
+		roads.OnCustomStartServer ();
+
+		var randomPositions = AchievementController.GetRandomPositions (COINS_COUNT, roads);
 
 		foreach (Vector2 position in randomPositions) {
 			NetworkServer.Spawn (
@@ -36,7 +42,7 @@ public class PlayersHub : NetworkBehaviour {
 			);
 		}
 
-		var superPosition = AchievementController.GetPoint();
+		var superPosition = AchievementController.GetPoint(roads);
 		NetworkServer.Spawn (
 			Instantiate (
 				superAchievementPrefab,
@@ -44,8 +50,6 @@ public class PlayersHub : NetworkBehaviour {
 				Quaternion.AngleAxis(45, Vector3.up) * Quaternion.AngleAxis(90, Vector3.forward)
 			)
 		);
-
-		api = new HttpApiLogic (HttpRequestSender.GetInstance ());
 	}
 
 	public static PlayersHub GetInstance () {

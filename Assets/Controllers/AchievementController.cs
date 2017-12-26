@@ -5,18 +5,18 @@ using UnityEngine.Networking;
 using System.Linq;
 
 public class AchievementController : NetworkBehaviour {
-  private PlayersHub hub;
-  public bool isSuper;
+	private PlayersHub hub;
+	public bool isSuper;
 
-  public override void OnStartServer () {
-    if (isServer) {
-      hub = PlayersHub.GetInstance ();
-    }
-  }
+	public override void OnStartServer () {
+		if (isServer) {
+		  hub = PlayersHub.GetInstance ();
+		}
+	}
 
-  void Update () {
-    transform.Rotate (Vector3.up * Time.deltaTime * 100, Space.World);
-  }
+	void Update () {
+		transform.Rotate (Vector3.up * Time.deltaTime * 100, Space.World);
+	}
 
 	void OnTriggerEnter (Collider other)
 	{
@@ -26,95 +26,72 @@ public class AchievementController : NetworkBehaviour {
 	[Command]
 	void CmdApplyAchievement (NetworkInstanceId netId) {
 		lock (this) {
-      if (gameObject.activeSelf) {
-        gameObject.SetActive (false);
-        RpcSetInactive ();
-  			hub.ApplyAchievement (netId, isSuper);
-      }
+		  if (gameObject.activeSelf) {
+		    gameObject.SetActive (false);
+		    RpcSetInactive ();
+			hub.ApplyAchievement (netId, isSuper);
+		  }
 		}
 	}
 
-  [ClientRpc]
-  void RpcSetInactive () {
-    gameObject.SetActive (false);
-  }
+	[ClientRpc]
+	void RpcSetInactive () {
+		gameObject.SetActive (false);
+	}
 
-  public static List<Vector2> GetRandomPositions (int count) {
-    return Enumerable
-      .Range(0, count)
-      .Select<int, Vector2>((c) => GetPoint())
-      .ToList<Vector2>();
-  }
+	public static List<Vector2> GetRandomPositions (int count, RoadController roads) {
+		return Enumerable
+	  		.Range(0, count)
+			.Select<int, Vector2>((c) => GetPoint(roads))
+	  		.ToList<Vector2>();
+	}
 
-  public static Vector2 GetPoint () {
-    float x = InterpolateX (GetX ());
+	public static Vector2 GetPoint (RoadController roads) {
+		float x = GetX ();
 
-    return new Vector2 (
-      x,
-      GetY (
-        GetYRange (
-          x
-        )
-      )
-    );
-  }
+		return new Vector2 (
+			roads.InterpolateX(x),
+	  		GetY (
+	    		GetYRange (
+					roads.GetYsInIntersections (x)
+	    		)
+	  		)
+		);
+	}
 
-  private static float GetX () {
-    return Random.Range (0f, 1f);
-  }
+	private static float GetX () {
+		return Random.Range (0f, 1f);
+	}
 
-  private static float GetY (Range yRange) {
-    return yRange.Random;
-  }
+	private static float GetY (Range[] yRanges) {
+		var randomRangeIndex = new System.Random().Next(yRanges.Length);
 
-  private static float InterpolateX (float oldX) {
-    if (oldX <= 0.35) {
-      return oldX * 18f - 9f;
-    }
+		return Random.Range (yRanges [randomRangeIndex].min, yRanges [randomRangeIndex].max);
+	}
 
-    if (oldX <= 0.65) {
-      return oldX * 80 + 10;
-    }
+	private static Range[] GetYRange (float[] ys) {
+		var points = ys;
 
-    return oldX * 18f + 91f;
-  }
+		Range[] ranges = new Range[(int)(points.Length / 2)];
 
-  private static Range GetYRange (float x) {
-    if (x <= 10) {
-      return new Range {
-        min = 30,
-        max = 110
-      };
-    }
+		for (int i = 0; i < points.Length / 2; i++) {
+			ranges [i] = new Range {
+				min = points[2 * i],
+				max = points[2 * i + 1]
+			};
+		}
 
-    if (x <= 50) {
-      return new Range {
-        min = x + 82,
-        max = x + 118
-      };
-    }
+		return ranges;
+	}
 
-    if (x <= 90) {
-      return new Range {
-        min = -x + 182,
-        max = -x + 218
-      };
-    }
+	private class Range {
+		public float min;
+		public float max;
 
-    return new Range {
-      min = 20,
-      max = 110
-    };
-  }
-
-  private class Range {
-    public float min;
-    public float max;
-
-    public float Random {
-      get {
-        return UnityEngine.Random.Range (min, max);
-      }
-    }
-  }
+		public float Random {
+		  get {
+		    return UnityEngine.Random.Range (min, max);
+		  }
+		}
+	}
 }
