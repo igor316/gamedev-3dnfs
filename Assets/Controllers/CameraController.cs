@@ -21,7 +21,7 @@ public class CameraController : MonoBehaviour {
 			Vector3 offset =  -15 * player.transform.forward;
 
 			Vector3 origin = player.transform.position + offset;
-			Vector3 delta = (origin - currWithTranslationalOffset) / 30;
+			Vector3 delta = (origin - currWithTranslationalOffset) / 20;
 			Vector3 newPosition = currWithTranslationalOffset + delta;
 			newPosition.y = 10;
 
