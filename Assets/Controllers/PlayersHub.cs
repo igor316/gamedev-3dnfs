@@ -102,7 +102,9 @@ public class PlayersHub : NetworkBehaviour {
 	public void UpdateTimeText (float time) {
 		this.time = time;
 		foreach (CarController player in players) {
-			player.RpcUpdateTimeText (time);
+			if (player != null) {
+				player.RpcUpdateTimeText (time);
+			}
 		}
 	}
 
